@@ -9,22 +9,45 @@
     <style>
         :root { --evergreen: #2d5a27; --dark: #1a1a1a; --border-gray: #ddd; --bg: #f4f4f9; }
         body { font-family: sans-serif; background-color: var(--bg); padding: 10px; display: flex; justify-content: center; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 12px; border: 3px solid var(--evergreen); box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 480px; width: 100%; text-align: center; position: relative; }
+        
+        .card { 
+            background: white; padding: 20px; border-radius: 12px; 
+            border: 3px solid var(--evergreen); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 480px; width: 100%; 
+            text-align: center; position: relative; min-height: 600px;
+        }
+        
         #gate { display: block; color: black; }
         #calculator { display: none; }
+        
         h1 { margin: 0; color: var(--dark); font-size: 1.7rem; font-weight: 800; }
         .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 0.7rem; color: #666; text-align: left; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid var(--border-gray); border-radius: 8px; font-size: 1rem; box-sizing: border-box; text-align: center; margin-bottom: 8px; color: black; }
-        .line-item { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 12px; position: relative; text-align: left; border-left: 5px solid var(--evergreen); }
+        
+        .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 0.65rem; color: #666; text-align: left; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid var(--border-gray); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; text-align: center; margin-bottom: 8px; color: black; }
+        
+        .line-item { 
+            background: #f9f9f9; border: 1px solid #eee; padding: 15px; 
+            border-radius: 8px; margin-bottom: 12px; position: relative; 
+            text-align: left; border-left: 5px solid var(--evergreen);
+        }
         .remove-btn { position: absolute; top: 8px; right: 12px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.3rem; }
+        
         .result-box { background: var(--dark); color: white; padding: 18px; border-radius: 8px; margin-top: 20px; text-align: right; }
-        .res-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 6px; }
-        .result-value { font-size: 2.3rem; font-weight: 800; margin-top: 8px; border-top: 1px solid #444; padding-top: 8px; }
-        .btn { border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .res-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
+        .result-value { font-size: 2.2rem; font-weight: 800; margin-top: 8px; border-top: 1px solid #444; padding-top: 8px; }
+        
+        .btn { border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; margin-top: 10px; transition: 0.2s; }
         .btn-green { background: var(--evergreen); color: white; }
         .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
-        .sync-section { margin-top: 25px; padding: 15px; background: #f0f0f0; border-radius: 8px; font-size: 0.75rem; border: 1px dashed #ccc; }
+        
+        .sync-section { 
+            margin-top: 25px; padding: 15px; background: #f0f0f0; 
+            border-radius: 8px; font-size: 0.75rem; border: 1px dashed #ccc;
+        }
+        #syncStatus { color: var(--evergreen); font-weight: bold; margin-top: 5px; }
+        
         .footer { font-size: 0.65rem; color: #777; margin-top: 20px; line-height: 1.4; }
     </style>
 </head>
@@ -40,18 +63,49 @@
 
     <div id="calculator">
         <h1>EOCO</h1>
-        <div class="sub-brand">Integrated Quoting App</div>
+        <div class="sub-brand">Client Service Quoter</div>
         
-        <label>CLIENT NAME / PROJECT</label>
-        <input type="text" id="clientName" placeholder="e.g. Acme Services">
+        <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:8px; margin-bottom:20px;">
+            <label>* Customer Name</label>
+            <input type="text" id="custName" placeholder="Full Name as in QBO">
+            
+            <div class="setup-grid">
+                <div>
+                    <label>* Invoice No.</label>
+                    <input type="text" id="invNo" placeholder="e.g. 1001">
+                </div>
+                <div>
+                    <label>Terms</label>
+                    <select id="terms">
+                        <option>Net 30</option>
+                        <option>Net 15</option>
+                        <option>Due on Receipt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="setup-grid">
+                <div>
+                    <label>* Invoice Date</label>
+                    <input type="date" id="invDate">
+                </div>
+                <div>
+                    <label>* Due Date</label>
+                    <input type="date" id="dueDate">
+                </div>
+            </div>
+            
+            <label>Memo</label>
+            <input type="text" id="memo" placeholder="Internal notes">
+        </div>
         
         <div id="itemsContainer"></div>
 
-        <button class="btn btn-outline" onclick="addLineItem()">+ ADD ITEM FROM INVENTORY</button>
+        <button class="btn btn-outline" onclick="addLineItem()">+ ADD SERVICE ITEM</button>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <button class="btn btn-green" onclick="getPDF()">GET PDF</button>
-            <button class="btn btn-outline" onclick="exportQBO()">QBO IMPORT FILE</button>
+            <button class="btn btn-outline" onclick="exportQBO()">QBO IMPORT</button>
         </div>
 
         <div class="result-box">
@@ -63,8 +117,7 @@
 
         <div class="sync-section">
             <strong>SYNC QBO PRICING</strong><br>
-            Upload "Products & Services" CSV.<br>
-            <em>Col A: Name | Col H: Price</em><br><br>
+            Col A: Name | Col H: Price<br><br>
             <input type="file" id="csvFile" accept=".csv" onchange="syncQBO(this)">
             <div id="syncStatus"></div>
         </div>
@@ -75,22 +128,30 @@
 
 <script>
     const KEY = "NovaScotia2026";
-    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Service", price: 100 }];
+    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Service", price: 100.00 }];
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
             localStorage.setItem('eoco_auth_quote', "true");
             openApp();
-        }
+        } else { alert("Access Denied."); }
     }
 
     window.onload = function() {
         if (localStorage.getItem('eoco_auth_quote') === "true") openApp();
+        // Set default dates
+        const now = new Date();
+        document.getElementById('invDate').valueAsDate = now;
+        const thirtyDays = new Date(now.setDate(now.getDate() + 30));
+        document.getElementById('dueDate').valueAsDate = thirtyDays;
     };
 
     function openApp() {
         document.getElementById('gate').style.display = "none";
         document.getElementById('calculator').style.display = "block";
+        if (localStorage.getItem('eoco_inventory')) {
+            document.getElementById('syncStatus').innerText = "✓ System synced with QBO Inventory";
+        }
         calculate();
     }
 
@@ -99,12 +160,13 @@
         const div = document.createElement('div');
         div.className = 'line-item';
         let options = INVENTORY.map((item, i) => `<option value="${i}">${item.name} ($${item.price.toFixed(2)})</option>`).join('');
+        
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Item</label>
+            <label>Service / Item</label>
             <select class="item-sel" onchange="calculate()">${options}</select>
             <label>Quantity</label>
-            <input type="number" class="qty-inp" value="1" step="0.5" oninput="calculate()">
+            <input type="number" class="qty-inp" value="1" min="0.25" step="0.25" oninput="calculate()">
         `;
         container.appendChild(div);
         calculate();
@@ -138,7 +200,6 @@
             if (newInv.length > 0) {
                 INVENTORY = newInv;
                 localStorage.setItem('eoco_inventory', JSON.stringify(newInv));
-                alert("Inventory Loaded!");
                 location.reload();
             }
         };
@@ -146,12 +207,15 @@
     }
 
     function exportQBO() {
-        const client = document.getElementById('clientName').value || "Client";
-        const today = new Date().toLocaleDateString('en-US'); 
-        const invNo = "Q" + Date.now().toString().slice(-6);
+        const client = document.getElementById('custName').value || "Client";
+        const invNo = document.getElementById('invNo').value || "1001";
+        const invDate = document.getElementById('invDate').value;
+        const dueDate = document.getElementById('dueDate').value;
+        const terms = document.getElementById('terms').value;
+        const memo = document.getElementById('memo').value;
         
-        // Exact QBO Template Headers
-        let csvContent = "*InvoiceNo,*Customer,*InvoiceDate,*DueDate,Terms,Location,Memo,Item(Product/Service),ItemDescription,ItemQuantity,ItemRate,*ItemAmount,*ItemTaxCode,ItemTaxAmount\n";
+        // Exact QBO Template Structure
+        let csv = "*InvoiceNo,*Customer,*InvoiceDate,*DueDate,Terms,Location,Memo,Item(Product/Service),ItemDescription,ItemQuantity,ItemRate,*ItemAmount,*ItemTaxCode,ItemTaxAmount\n";
         
         const sels = document.querySelectorAll('.item-sel');
         const qtys = document.querySelectorAll('.qty-inp');
@@ -161,28 +225,26 @@
             const qty = parseFloat(qtys[i].value) || 0;
             const amt = item.price * qty;
             const taxAmt = amt * 0.14;
-            
-            // Build the row
-            csvContent += `${invNo},${client},${today},${today},Net 30,,EOCO Quote,${item.name},,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+            csv += `${invNo},${client},${invDate},${dueDate},${terms},,${memo},"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
         });
 
-        const blob = new Blob([csvContent], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
+        const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', `QBO_Import_${client.replace(/\s+/g, '_')}.csv`);
+        a.href = window.URL.createObjectURL(blob);
+        a.download = `QBO_Import_${invNo}_${client.replace(/\s+/g, '_')}.csv`;
         a.click();
     }
 
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const client = document.getElementById('clientName').value || "Client";
+        const client = document.getElementById('custName').value || "Client";
         doc.setFontSize(22); doc.setTextColor(45, 90, 39);
         doc.text("EOCO | Project Estimate", 20, 25);
         doc.setFontSize(10); doc.setTextColor(0);
-        doc.text(`Client: ${client}`, 20, 45);
-        doc.text(`Total: ${document.getElementById('total').innerText}`, 20, 55);
+        doc.text(`Customer: ${client}`, 20, 45);
+        doc.text(`Invoice #: ${document.getElementById('invNo').value}`, 20, 52);
+        doc.text(`Total: ${document.getElementById('total').innerText}`, 20, 62);
         doc.save(`EOCO_Quote_${client}.pdf`);
     }
 </script>
