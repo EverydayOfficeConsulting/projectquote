@@ -7,48 +7,50 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --border-gray: #ddd; --bg: #f4f4f9; }
-        body { font-family: sans-serif; background-color: var(--bg); padding: 10px; display: flex; justify-content: center; margin: 0; }
+        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --border: #ddd; --bg: #f4f4f9; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); padding: 10px; display: flex; justify-content: center; margin: 0; }
         
         .card { 
-            background: white; padding: 20px; border-radius: 12px; 
-            border: 3px solid var(--evergreen); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 480px; width: 100%; 
-            text-align: center; position: relative; min-height: 600px;
+            background: white; padding: 25px; border-radius: 16px; 
+            border: 4px solid var(--evergreen); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-width: 520px; width: 100%; 
+            text-align: center; position: relative;
         }
         
-        #gate { display: block; color: black; }
+        #gate { display: block; }
         #calculator { display: none; }
         
-        h1 { margin: 0; color: var(--dark); font-size: 1.7rem; font-weight: 800; }
-        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        h1 { margin: 0; color: var(--dark); font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.85rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; }
         
-        .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        label { display: block; margin: 12px 0 4px; font-weight: 600; font-size: 0.65rem; color: #666; text-align: left; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid var(--border-gray); border-radius: 8px; font-size: 0.9rem; box-sizing: border-box; text-align: center; margin-bottom: 8px; color: black; }
-        
+        /* Project Header Section */
+        .setup-section { background:#f9f9f9; border:1px solid var(--border); padding:18px; border-radius:12px; margin-bottom:20px; text-align: left; }
+        label { display: block; margin: 12px 0 4px; font-weight: 700; font-size: 0.65rem; color: #555; text-transform: uppercase; }
+        input, select { width: 100%; padding: 14px; border: 2px solid var(--border); border-radius: 10px; font-size: 1rem; box-sizing: border-box; margin-bottom: 10px; color: black; outline-color: var(--evergreen); }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* Item Cards */
         .line-item { 
-            background: #f9f9f9; border: 1px solid #eee; padding: 15px; 
-            border-radius: 8px; margin-bottom: 12px; position: relative; 
-            text-align: left; border-left: 5px solid var(--evergreen);
+            background: #fff; border: 1px solid #eee; padding: 15px; 
+            border-radius: 12px; margin-bottom: 15px; position: relative; 
+            text-align: left; border-left: 6px solid var(--evergreen);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        .remove-btn { position: absolute; top: 8px; right: 12px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.3rem; }
+        .remove-btn { position: absolute; top: 10px; right: 15px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.5rem; }
         
-        .result-box { background: var(--dark); color: white; padding: 18px; border-radius: 8px; margin-top: 20px; text-align: right; }
-        .res-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
-        .result-value { font-size: 2.2rem; font-weight: 800; margin-top: 8px; border-top: 1px solid #444; padding-top: 8px; }
-        
-        .btn { border: none; padding: 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; margin-top: 10px; transition: 0.2s; }
+        /* Summary Box */
+        .result-box { background: var(--dark); color: white; padding: 20px; border-radius: 12px; margin-top: 25px; text-align: right; }
+        .res-row { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 8px; opacity: 0.8; }
+        .result-value { font-size: 2.5rem; font-weight: 900; margin-top: 10px; border-top: 1px solid #444; padding-top: 10px; color: #fff; }
+
+        /* Buttons */
+        .btn { border: none; padding: 16px; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.9rem; width: 100%; margin-top: 12px; transition: 0.2s transform; }
+        .btn:active { transform: scale(0.98); }
         .btn-green { background: var(--evergreen); color: white; }
-        .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
+        .btn-outline { background: white; border: 3px solid var(--evergreen); color: var(--evergreen); }
         
-        .sync-section { 
-            margin-top: 25px; padding: 15px; background: #f0f0f0; 
-            border-radius: 8px; font-size: 0.75rem; border: 1px dashed #ccc;
-        }
-        #syncStatus { color: var(--evergreen); font-weight: bold; margin-top: 5px; }
-        
-        .footer { font-size: 0.65rem; color: #777; margin-top: 20px; line-height: 1.4; }
+        .sync-section { margin-top: 30px; padding: 20px; background: #eee; border-radius: 12px; font-size: 0.8rem; border: 2px dashed #bbb; }
+        .footer { font-size: 0.7rem; color: #888; margin-top: 25px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -57,89 +59,80 @@
     <div id="gate">
         <h1>EOCO</h1>
         <div class="sub-brand">Quote Master Access</div>
-        <input type="password" id="passInput" placeholder="Password">
+        <input type="password" id="passInput" placeholder="Enter Access Code">
         <button class="btn btn-green" onclick="unlock()">UNLOCK SYSTEM</button>
     </div>
 
     <div id="calculator">
         <h1>EOCO</h1>
-        <div class="sub-brand">Client Service Quoter</div>
+        <div class="sub-brand">Project Quote Master</div>
         
-        <div style="background:#fff; border:1px solid #ddd; padding:15px; border-radius:8px; margin-bottom:20px;">
-            <label>* Customer Name</label>
-            <input type="text" id="custName" placeholder="Full Name as in QBO">
+        <div class="setup-section">
+            <label>* Customer Name (Match QBO)</label>
+            <input type="text" id="custName" placeholder="Full Customer Name">
             
-            <div class="setup-grid">
-                <div>
-                    <label>* Invoice No.</label>
-                    <input type="text" id="invNo" placeholder="e.g. 1001">
-                </div>
+            <div class="grid-2">
+                <div><label>* Invoice #</label><input type="text" id="invNo" placeholder="e.g. 1001"></div>
                 <div>
                     <label>Terms</label>
                     <select id="terms">
-                        <option>Net 30</option>
-                        <option>Net 15</option>
-                        <option>Due on Receipt</option>
+                        <option>Net 30</option><option>Net 15</option><option>Due on receipt</option>
                     </select>
                 </div>
             </div>
 
-            <div class="setup-grid">
-                <div>
-                    <label>* Invoice Date</label>
-                    <input type="date" id="invDate">
-                </div>
-                <div>
-                    <label>* Due Date</label>
-                    <input type="date" id="dueDate">
-                </div>
+            <div class="grid-2">
+                <div><label>* Invoice Date</label><input type="date" id="invDate"></div>
+                <div><label>* Due Date</label><input type="date" id="dueDate"></div>
             </div>
             
-            <label>Memo</label>
-            <input type="text" id="memo" placeholder="Internal notes">
+            <label>Internal Memo / Project Notes</label>
+            <input type="text" id="memo" placeholder="Visible to Admin">
         </div>
         
         <div id="itemsContainer"></div>
 
-        <button class="btn btn-outline" onclick="addLineItem()">+ ADD SERVICE ITEM</button>
+        <button class="btn btn-outline" onclick="addLineItem()">+ ADD ITEM FROM INVENTORY</button>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button class="btn btn-green" onclick="getPDF()">GET PDF</button>
-            <button class="btn btn-outline" onclick="exportQBO()">QBO IMPORT</button>
+        <div class="grid-2">
+            <button class="btn btn-green" onclick="getPDF()">GENERATE PROPOSAL</button>
+            <button class="btn btn-outline" onclick="exportCSV()">QBO IMPORT FILE</button>
         </div>
 
         <div class="result-box">
             <div class="res-row"><span>Subtotal:</span><span id="subTotal">$0.00</span></div>
-            <div class="res-row"><span>HST (14%):</span><span id="taxTotal">$0.00</span></div>
+            <div class="res-row"><span>Nova Scotia HST (14%):</span><span id="taxTotal">$0.00</span></div>
             <div id="total" class="result-value">$0.00</div>
-            <div style="font-size: 0.6rem; color: #888; text-transform: uppercase;">Estimated Total</div>
         </div>
 
         <div class="sync-section">
-            <strong>SYNC QBO PRICING</strong><br>
-            Col A: Name | Col H: Price<br><br>
+            <strong>SYNC MASTER PRICING</strong><br>
+            Upload your QBO "Products & Services" CSV.<br>
+            (Col A: Name | Col H: Price)<br><br>
             <input type="file" id="csvFile" accept=".csv" onchange="syncQBO(this)">
-            <div id="syncStatus"></div>
+            <div id="syncStatus" style="margin-top:10px; font-weight:bold; color:var(--evergreen);"></div>
         </div>
 
-        <div class="footer">© 2026 EOCO - Nova Scotia</div>
+        <div class="footer">
+            © 2026 Everyday Office Consulting - Nova Scotia<br>
+            Calculated with 14% provincial HST.
+        </div>
     </div>
 </div>
 
 <script>
     const KEY = "NovaScotia2026";
-    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Service", price: 100.00 }];
+    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Service Item", price: 100.00 }];
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
             localStorage.setItem('eoco_auth_quote', "true");
             openApp();
-        } else { alert("Access Denied."); }
+        }
     }
 
     window.onload = function() {
         if (localStorage.getItem('eoco_auth_quote') === "true") openApp();
-        // Set default dates
         const now = new Date();
         document.getElementById('invDate').valueAsDate = now;
         const thirtyDays = new Date(now.setDate(now.getDate() + 30));
@@ -150,7 +143,7 @@
         document.getElementById('gate').style.display = "none";
         document.getElementById('calculator').style.display = "block";
         if (localStorage.getItem('eoco_inventory')) {
-            document.getElementById('syncStatus').innerText = "✓ System synced with QBO Inventory";
+            document.getElementById('syncStatus').innerText = "✓ System Synced with QBO Prices";
         }
         calculate();
     }
@@ -159,11 +152,11 @@
         const container = document.getElementById('itemsContainer');
         const div = document.createElement('div');
         div.className = 'line-item';
-        let options = INVENTORY.map((item, i) => `<option value="${i}">${item.name} ($${item.price.toFixed(2)})</option>`).join('');
+        let options = INVENTORY.sort((a,b) => a.name.localeCompare(b.name)).map((item, i) => `<option value="${i}">${item.name} ($${item.price.toFixed(2)})</option>`).join('');
         
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Service / Item</label>
+            <label>Select Product/Service</label>
             <select class="item-sel" onchange="calculate()">${options}</select>
             <label>Quantity</label>
             <input type="number" class="qty-inp" value="1" min="0.25" step="0.25" oninput="calculate()">
@@ -206,17 +199,15 @@
         reader.readAsText(file);
     }
 
-    function exportQBO() {
+    function exportCSV() {
         const client = document.getElementById('custName').value || "Client";
         const invNo = document.getElementById('invNo').value || "1001";
-        const invDate = document.getElementById('invDate').value;
-        const dueDate = document.getElementById('dueDate').value;
+        const invDate = document.getElementById('invDate').value.split('-').reverse().join('/');
+        const dueDate = document.getElementById('dueDate').value.split('-').reverse().join('/');
         const terms = document.getElementById('terms').value;
         const memo = document.getElementById('memo').value;
         
-        // Exact QBO Template Structure
         let csv = "*InvoiceNo,*Customer,*InvoiceDate,*DueDate,Terms,Location,Memo,Item(Product/Service),ItemDescription,ItemQuantity,ItemRate,*ItemAmount,*ItemTaxCode,ItemTaxAmount\n";
-        
         const sels = document.querySelectorAll('.item-sel');
         const qtys = document.querySelectorAll('.qty-inp');
 
@@ -225,27 +216,82 @@
             const qty = parseFloat(qtys[i].value) || 0;
             const amt = item.price * qty;
             const taxAmt = amt * 0.14;
-            csv += `${invNo},${client},${invDate},${dueDate},${terms},,${memo},"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+            
+            // QBO logic: Header info on first row only
+            if (i === 0) {
+                csv += `${invNo},${client},${invDate},${dueDate},${terms},,${memo},"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+            } else {
+                csv += `${invNo},,,,,,,,"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+            }
         });
 
         const blob = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
         a.href = window.URL.createObjectURL(blob);
-        a.download = `QBO_Import_${invNo}_${client.replace(/\s+/g, '_')}.csv`;
+        a.download = `QBO_Import_${invNo}.csv`;
         a.click();
     }
 
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const client = document.getElementById('custName').value || "Client";
-        doc.setFontSize(22); doc.setTextColor(45, 90, 39);
-        doc.text("EOCO | Project Estimate", 20, 25);
-        doc.setFontSize(10); doc.setTextColor(0);
-        doc.text(`Customer: ${client}`, 20, 45);
-        doc.text(`Invoice #: ${document.getElementById('invNo').value}`, 20, 52);
-        doc.text(`Total: ${document.getElementById('total').innerText}`, 20, 62);
-        doc.save(`EOCO_Quote_${client}.pdf`);
+        const client = document.getElementById('custName').value || "Valued Customer";
+        
+        // Header
+        doc.setFontSize(24); doc.setTextColor(45, 90, 39);
+        doc.text("EOCO PROJECT PROPOSAL", 20, 25);
+        doc.setFontSize(10); doc.setTextColor(100);
+        doc.text("Everyday Office Consulting - Simple Systems. Better Business.", 20, 32);
+        doc.setDrawColor(45, 90, 39); doc.setLineWidth(1);
+        doc.line(20, 38, 190, 38);
+
+        // Project Info
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`Customer: ${client}`, 20, 50);
+        doc.text(`Estimate Reference: ${document.getElementById('invNo').value}`, 20, 57);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 64);
+        
+        // Items Table
+        doc.setFontSize(12); doc.setTextColor(45, 90, 39);
+        doc.text("SCOPE OF WORK & SERVICES", 20, 80);
+        
+        let y = 90;
+        const sels = document.querySelectorAll('.item-sel');
+        const qtys = document.querySelectorAll('.qty-inp');
+        
+        sels.forEach((s, i) => {
+            const item = INVENTORY[s.value];
+            const qty = parseFloat(qtys[i].value) || 0;
+            const total = item.price * qty;
+            
+            doc.setFontSize(10); doc.setTextColor(80);
+            doc.text(`${item.name}`, 25, y);
+            doc.text(`Qty: ${qty}`, 130, y);
+            doc.text(`$${total.toFixed(2)}`, 180, y, { align: 'right' });
+            y += 10;
+            if (y > 260) { doc.addPage(); y = 20; }
+        });
+
+        // Totals
+        y += 10;
+        doc.setDrawColor(200); doc.line(20, y, 190, y);
+        y += 15;
+        doc.setFontSize(10); doc.text("Subtotal:", 130, y);
+        doc.text(document.getElementById('subTotal').innerText, 180, y, { align: 'right' });
+        y += 8;
+        doc.text("NS HST (14%):", 130, y);
+        doc.text(document.getElementById('taxTotal').innerText, 180, y, { align: 'right' });
+        
+        y += 12;
+        doc.setFillColor(45, 90, 39); doc.rect(120, y-8, 70, 15, 'F');
+        doc.setTextColor(255); doc.setFontSize(14);
+        doc.text("TOTAL ESTIMATE", 125, y);
+        doc.text(document.getElementById('total').innerText, 185, y, { align: 'right' });
+
+        doc.setTextColor(150); doc.setFontSize(8);
+        doc.text("This is a budgetary estimate valid for 30 days. © 2026 EOCO", 20, 280);
+        
+        doc.save(`EOCO_Proposal_${client.replace(/\s+/g, '_')}.pdf`);
     }
 </script>
 </body>
