@@ -3,85 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EOCO | Project Quote Master</title>
+    <title>EOCO | Quote Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --evergreen: #2d5a27; --dark: #1a1a1a; --bg: #f4f4f9; }
-        body { font-family: sans-serif; background: var(--bg); padding: 15px; display: flex; justify-content: center; }
+        body { font-family: sans-serif; background: var(--bg); padding: 15px; display: flex; justify-content: center; margin: 0; }
         .card { background: white; padding: 20px; border-radius: 12px; border: 3px solid var(--evergreen); max-width: 500px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        
         h1 { margin: 0; font-size: 1.8rem; text-align: center; }
         .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
-        
         #gate { text-align: center; }
         #calculator { display: none; }
-        
-        .setup-section { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--evergreen); }
-        label { display: block; font-size: 0.7rem; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-
-        /* Line Item Table */
-        .line-item { background: #fff; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; position: relative; }
-        .remove-btn { position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; }
-        
-        .totals-section { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: right; }
+        .setup-section { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--evergreen); }
+        label { display: block; font-size: 0.65rem; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 4px; }
+        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .line-item { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; border-left: 3px solid #ccc; }
+        .remove-btn { position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.2rem; }
+        .totals-box { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
         .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
-        .grand-total { font-size: 2rem; font-weight: 800; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px; }
-
+        .grand-total { font-size: 2.2rem; font-weight: 800; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px; }
         .btn { border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 0.9rem; }
         .btn-green { background: var(--evergreen); color: white; }
         .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
     </style>
 </head>
 <body>
-
 <div class="card">
     <div id="gate">
         <h1>EOCO</h1>
-        <div class="sub-brand">Secure Quoting System</div>
+        <div class="sub-brand">Secure Quote Master</div>
         <input type="password" id="passInput" placeholder="Password">
         <button class="btn btn-green" onclick="unlock()">ACCESS SYSTEM</button>
     </div>
-
     <div id="calculator">
         <h1>EOCO</h1>
-        <div class="sub-brand">Project Quote Master</div>
-
+        <div class="sub-brand">Client Service Quoter</div>
         <div class="setup-section">
-            <label>Project / Client Name</label>
-            <input type="text" id="projName" placeholder="e.g. Smith Deck">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div><label>Labor Rate ($/hr)</label><input type="number" id="labRate" value="75"></div>
-                <div><label>Material Markup (%)</label><input type="number" id="markup" value="20"></div>
-            </div>
+            <label>Client Name</label>
+            <input type="text" id="projName" placeholder="e.g. Acme Corp">
         </div>
-
-        <div id="itemsContainer">
-            </div>
-
-        <button class="btn btn-outline" onclick="addLineItem()">+ ADD ITEM FROM INVENTORY</button>
-        <button class="btn btn-green" onclick="getPDF()">DOWNLOAD PDF QUOTE</button>
-
-        <div class="totals-section">
-            <div class="total-row"><span>Material Total:</span><span id="matSub">$0.00</span></div>
-            <div class="total-row"><span>Labor Total:</span><span id="labSub">$0.00</span></div>
-            <div class="total-row"><span>HST (15%):</span><span id="taxSub">$0.00</span></div>
+        <div id="itemsContainer"></div>
+        <button class="btn btn-outline" onclick="addLineItem()">+ ADD SERVICE FROM SHEET1</button>
+        <button class="btn btn-green" onclick="getPDF()">GENERATE FINAL QUOTE PDF</button>
+        <div class="totals-box">
+            <div class="total-row"><span>Monthly Subtotal:</span><span id="subTotal">$0.00</span></div>
+            <div class="total-row"><span>HST (15%):</span><span id="taxTotal">$0.00</span></div>
             <div class="grand-total" id="grandTotal">$0.00</div>
         </div>
     </div>
 </div>
-
 <script>
     const KEY = "NovaScotia2026";
-    // DATA FROM YOUR SHEET1
-    const INVENTORY = [
-        { desc: "ROOFING - Asphalt Shingles (per sq)", price: 145.00, labHr: 1.25 },
-        { desc: "DECKING - Pressure Treated (per lf)", price: 12.50, labHr: 0.15 },
-        { desc: "SIDING - Vinyl (per sq)", price: 185.00, labHr: 2.50 },
-        { desc: "WINDOW - Standard Install", price: 450.00, labHr: 3.00 },
-        { desc: "DOOR - Exterior Pre-hung", price: 850.00, labHr: 4.50 },
-        { desc: "CONCRETE - Post Mix (per bag)", price: 9.75, labHr: 0.25 }
-    ];
+    // DATA MAPPED DIRECTLY FROM YOUR SHEET1.CSV
+    const SERVICES = {
+        "Recording Transactions": [
+            {tier: "0-25", price: 25}, {tier: "26-50", price: 50}, {tier: "51-75", price: 75}, {tier: "76-100", price: 100},
+            {tier: "101-125", price: 125}, {tier: "126-150", price: 150}, {tier: "151-175", price: 175}, {tier: "176-200", price: 200}
+        ],
+        "Lump Sum Deposits": [
+            {tier: "0-25", price: 11}, {tier: "26-50", price: 23}, {tier: "51-75", price: 35}, {tier: "76-100", price: 47},
+            {tier: "101-125", price: 59}, {tier: "126-150", price: 71}, {tier: "151-175", price: 83}, {tier: "176-200", price: 95}
+        ],
+        "Accounts Payable/Receivable": [
+            {tier: "0-25", price: 100}, {tier: "26-50", price: 200}, {tier: "51-75", price: 300}, {tier: "76-100", price: 400},
+            {tier: "101-125", price: 500}, {tier: "126-150", price: 600}, {tier: "151-175", price: 700}, {tier: "176-200", price: 800}
+        ],
+        "Reconciliations (Bank/PayPal)": [
+            {tier: "1-4 accounts", price: 90}, {tier: "5-8 accounts", price: 180}, {tier: "9-12 accounts", price: 270}
+        ],
+        "Payroll: Fixed Salary": [
+            {tier: "1 Staff", price: 15}, {tier: "2 Staff", price: 30}, {tier: "3 Staff", price: 45}, {tier: "4 Staff", price: 60}, {tier: "5 Staff", price: 75}
+        ],
+        "Payroll: Variable Salary": [
+            {tier: "1 Staff", price: 20}, {tier: "2 Staff", price: 40}, {tier: "3 Staff", price: 60}, {tier: "4 Staff", price: 80}, {tier: "5 Staff", price: 100}
+        ],
+        "Software Subscriptions": [
+            {tier: "Xero", price: 50}, {tier: "Quickbooks", price: 50}, {tier: "Dext", price: 50}, {tier: "Hubdoc", price: 50}, {tier: "Wagepoint", price: 50}
+        ],
+        "Miscellaneous": [
+            {tier: "Petty Cash Track", price: 50}, {tier: "Financial Stmts", price: 20}, {tier: "Tax Return (YE)", price: 50}, {tier: "HST Returns", price: 50}
+        ]
+    };
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
@@ -94,70 +95,53 @@
         const container = document.getElementById('itemsContainer');
         const div = document.createElement('div');
         div.className = 'line-item';
-        
-        let options = INVENTORY.map((item, index) => `<option value="${index}">${item.desc}</option>`).join('');
-        
+        let catOptions = Object.keys(SERVICES).map(cat => `<option value="${cat}">${cat}</option>`).join('');
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Item Description</label>
-            <select class="item-select" onchange="calculate()">
-                ${options}
-            </select>
-            <label>Quantity</label>
-            <input type="number" class="item-qty" value="1" min="1" oninput="calculate()">
+            <label>Service Category</label>
+            <select class="cat-select" onchange="updateTiers(this)">${catOptions}</select>
+            <label>Tier/Level</label>
+            <select class="tier-select" onchange="calculate()"></select>
         `;
         container.appendChild(div);
+        updateTiers(div.querySelector('.cat-select'));
+    }
+
+    function updateTiers(catSelect) {
+        const tierSelect = catSelect.parentElement.querySelector('.tier-select');
+        const cat = catSelect.value;
+        tierSelect.innerHTML = SERVICES[cat].map((t, i) => `<option value="${i}">${t.tier} ($${t.price})</option>`).join('');
         calculate();
     }
 
     function calculate() {
-        const selects = document.querySelectorAll('.item-select');
-        const qtys = document.querySelectorAll('.item-qty');
-        const labRate = parseFloat(document.getElementById('labRate').value) || 0;
-        const mark = parseFloat(document.getElementById('markup').value) / 100;
-
-        let matTotal = 0;
-        let labTotal = 0;
-
-        selects.forEach((select, i) => {
-            const item = INVENTORY[select.value];
-            const qty = parseFloat(qtys[i].value) || 0;
-            
-            // MATH LOGIC FROM PRICING TAB
-            matTotal += (item.price * qty) * (1 + mark);
-            labTotal += (item.labHr * qty * labRate);
+        const cats = document.querySelectorAll('.cat-select');
+        const tiers = document.querySelectorAll('.tier-select');
+        let sub = 0;
+        cats.forEach((cat, i) => {
+            const price = SERVICES[cat.value][tiers[i].value].price;
+            sub += price;
         });
-
-        const hst = (matTotal + labTotal) * 0.15; // Nova Scotia HST
-        const grand = matTotal + labTotal + hst;
-
-        document.getElementById('matSub').innerText = '$' + matTotal.toFixed(2);
-        document.getElementById('labSub').innerText = '$' + labTotal.toFixed(2);
-        document.getElementById('taxSub').innerText = '$' + hst.toFixed(2);
+        const tax = sub * 0.15;
+        const grand = sub + tax;
+        document.getElementById('subTotal').innerText = '$' + sub.toFixed(2);
+        document.getElementById('taxTotal').innerText = '$' + tax.toFixed(2);
         document.getElementById('grandTotal').innerText = '$' + grand.toLocaleString(undefined, {minimumFractionDigits: 2});
     }
 
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const proj = document.getElementById('projName').value || "Project";
-        
-        doc.setFontSize(20); doc.setTextColor(45, 90, 39);
-        doc.text("EOCO | Project Estimate", 20, 20);
-        
-        doc.setFontSize(10); doc.setTextColor(100);
-        doc.text(`Project: ${proj}`, 20, 30);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 35);
-        
+        const client = document.getElementById('projName').value || "Client";
+        doc.setFontSize(22); doc.setTextColor(45, 90, 39);
+        doc.text("EOCO | Service Quote", 20, 25);
         doc.setFontSize(12); doc.setTextColor(0);
-        doc.text(`Materials (w/ Markup): ${document.getElementById('matSub').innerText}`, 20, 50);
-        doc.text(`Labor Subtotal: ${document.getElementById('labSub').innerText}`, 20, 60);
-        doc.text(`HST (15%): ${document.getElementById('taxSub').innerText}`, 20, 70);
-        
-        doc.setFontSize(16);
-        doc.text(`GRAND TOTAL: ${document.getElementById('grandTotal').innerText}`, 20, 85);
-        
-        doc.save(`EOCO_Quote_${proj}.pdf`);
+        doc.text(`Client: ${client}`, 20, 40);
+        doc.text(`Monthly Subtotal: ${document.getElementById('subTotal').innerText}`, 20, 50);
+        doc.text(`HST (15%): ${document.getElementById('taxTotal').innerText}`, 20, 60);
+        doc.setFontSize(18);
+        doc.text(`ESTIMATED MONTHLY: ${document.getElementById('grandTotal').innerText}`, 20, 75);
+        doc.save(`EOCO_Quote_${client}.pdf`);
     }
 </script>
 </body>
