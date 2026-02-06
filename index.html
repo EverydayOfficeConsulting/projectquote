@@ -3,202 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EOCO | Project Quote Master</title>
+    <title>EOCO | QBO Sync Quoter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --border-gray: #ddd; }
-        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding: 10px; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 10px; border: 3px solid var(--evergreen); box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 450px; width: 100%; text-align: center; position: relative; min-height: 500px; }
-        #gate { display: block; color: black; }
+        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --bg: #f4f4f9; }
+        body { font-family: sans-serif; background: var(--bg); padding: 15px; display: flex; justify-content: center; margin: 0; }
+        .card { background: white; padding: 20px; border-radius: 12px; border: 3px solid var(--evergreen); max-width: 500px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 1.8rem; text-align: center; }
+        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
+        #gate { text-align: center; }
         #calculator { display: none; }
-        h1 { margin: 0; color: var(--dark); font-size: 1.6rem; font-weight: 800; }
-        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.75rem; margin-bottom: 15px; text-transform: uppercase; }
-        label { display: block; margin: 10px 0 2px; font-weight: 600; font-size: 0.7rem; color: #666; text-align: left; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid var(--border-gray); border-radius: 8px; font-size: 1rem; box-sizing: border-box; text-align: center; margin-bottom: 8px; color: black; }
-        .line-item { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative; text-align: left; border-left: 4px solid var(--evergreen); }
+        .line-item { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative; border-left: 4px solid var(--evergreen); }
         .remove-btn { position: absolute; top: 5px; right: 10px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.2rem; }
-        .result-box { background: var(--dark); color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: right; }
-        .res-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
-        .result-value { font-size: 2.2rem; font-weight: 800; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px; }
-        .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; margin-top: 8px; transition: 0.3s; }
+        .totals-box { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .res-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; }
+        .grand-total { font-size: 2.2rem; font-weight: 800; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px; }
+        .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 0.85rem; }
         .btn-green { background: var(--evergreen); color: white; }
         .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
-        .qr-section { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ddd; display: flex; flex-direction: column; align-items: center; }
-        #qrcode { margin-top: 5px; padding: 5px; background: white; border: 1px solid #eee; min-height: 75px; }
-        .footer { font-size: 0.65rem; color: #777; margin-top: 15px; line-height: 1.3; }
+        .sync-section { margin-top: 20px; padding: 15px; background: #eee; border-radius: 8px; font-size: 0.75rem; }
+        select, input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd; box-sizing: border-box; }
     </style>
 </head>
 <body>
-
 <div class="card">
     <div id="gate">
         <h1>EOCO</h1>
-        <div class="sub-brand">Quote Master Access</div>
+        <div class="sub-brand">Secure Access</div>
         <input type="password" id="passInput" placeholder="Password">
-        <button class="btn btn-green" onclick="unlock()">UNLOCK SYSTEM</button>
+        <button class="btn btn-green" onclick="unlock()">UNLOCK</button>
     </div>
-
     <div id="calculator">
         <h1>EOCO</h1>
-        <div class="sub-brand">Client Service Quoter</div>
-        <label>CLIENT NAME</label>
-        <input type="text" id="clientName" placeholder="e.g. Acme Bookkeeping">
+        <div class="sub-brand">QBO Integrated Quoter</div>
         
+        <input type="text" id="clientName" placeholder="Client Name">
         <div id="itemsContainer"></div>
+        
+        <button class="btn btn-outline" onclick="addLineItem()">+ ADD ITEM</button>
+        <button class="btn btn-green" onclick="getPDF()">DOWNLOAD PDF</button>
 
-        <button class="btn btn-outline" onclick="addLineItem()">+ ADD SERVICE FROM SHEET1</button>
-        <button class="btn btn-green" onclick="getPDF()">DOWNLOAD PDF QUOTE</button>
-
-        <div class="result-box">
-            <div class="res-row"><span>Monthly Subtotal:</span><span id="subTotal">$0.00</span></div>
-            <div class="res-row"><span>HST (14%):</span><span id="taxTotal">$0.00</span></div>
-            <div id="total" class="result-value">$0.00</div>
-            <div style="font-size: 0.6rem; color: #888; text-transform: uppercase;">Estimated Monthly Cost</div>
+        <div class="totals-box">
+            <div class="res-row"><span>Subtotal:</span><span id="sub">$0.00</span></div>
+            <div class="res-row"><span>HST (14%):</span><span id="tax">$0.00</span></div>
+            <div class="grand-total" id="grand">$0.00</div>
         </div>
 
-        <div class="qr-section"><div id="qrcode"></div></div>
-        <div class="footer">© 2026 EOCO - Nova Scotia</div>
+        <div class="sync-section">
+            <strong>Update Master Prices:</strong><br>
+            Export "Products & Services" from QBO as CSV, then upload here.<br><br>
+            <input type="file" id="csvFile" accept=".csv" onchange="syncQBO(this)">
+            <p id="syncStatus" style="color: var(--evergreen); font-weight: bold;"></p>
+        </div>
     </div>
 </div>
-
 <script>
     const KEY = "NovaScotia2026";
-    const URL = "https://tools.eoco.ca/projectquote/"; 
-    
-    const SERVICES = {
-        "Recording Transactions": [
-            {tier: "0-25", price: 25}, {tier: "26-50", price: 50}, {tier: "51-75", price: 75}, {tier: "76-100", price: 100},
-            {tier: "101-125", price: 125}, {tier: "126-150", price: 150}, {tier: "151-175", price: 175}, {tier: "176-200", price: 200}
-        ],
-        "Lump Sum Deposits": [
-            {tier: "0-25", price: 11}, {tier: "26-50", price: 23}, {tier: "51-75", price: 35}, {tier: "76-100", price: 47},
-            {tier: "101-125", price: 59}, {tier: "126-150", price: 71}, {tier: "151-175", price: 83}, {tier: "176-200", price: 95}
-        ],
-        "AP / AR - Modified Accrual": [
-            {tier: "0-25", price: 100}, {tier: "26-50", price: 200}, {tier: "51-75", price: 300}, {tier: "76-100", price: 400},
-            {tier: "101-125", price: 500}, {tier: "126-150", price: 600}, {tier: "151-175", price: 700}, {tier: "176-200", price: 800}
-        ],
-        "Account Reconciliation": [
-            {tier: "1-4 Accts", price: 90}, {tier: "5-8 Accts", price: 180}, {tier: "9-12 Accts", price: 270}
-        ],
-        "Payroll: Fixed Salary": [
-            {tier: "1 Staff", price: 15}, {tier: "2 Staff", price: 30}, {tier: "3 Staff", price: 45}, {tier: "4 Staff", price: 60}, {tier: "5 Staff", price: 75}
-        ],
-        "Payroll: Variable Salary": [
-            {tier: "1 Staff", price: 20}, {tier: "2 Staff", price: 40}, {tier: "3 Staff", price: 60}, {tier: "4 Staff", price: 80}, {tier: "5 Staff", price: 100}
-        ],
-        "Software Subscriptions": [
-            {tier: "Xero", price: 50}, {tier: "Quickbooks", price: 50}, {tier: "Dext", price: 50}, {tier: "Hubdoc", price: 50}, {tier: "Wagepoint", price: 50}
-        ],
-        "Misc Compliance": [
-            {tier: "Petty Cash Track", price: 50}, {tier: "Financial Stmts", price: 20}, {tier: "HST Returns", price: 50}, {tier: "YE Corp Tax", price: 50}
-        ]
-    };
+    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [
+        { name: "Default Service", price: 100 }
+    ];
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
-            localStorage.setItem('eoco_auth_quote', "true");
-            openApp();
-        } else { alert("Access Denied"); }
-    }
-
-    window.onload = function() {
-        if (localStorage.getItem('eoco_auth_quote') === "true") openApp();
-    };
-
-    function openApp() {
-        document.getElementById('gate').style.display = "none";
-        document.getElementById('calculator').style.display = "block";
-        calculate();
-        new QRCode(document.getElementById("qrcode"), { text: URL, width: 75, height: 75, colorDark : "#2d5a27" });
+            document.getElementById('gate').style.display = "none";
+            document.getElementById('calculator').style.display = "block";
+            if (localStorage.getItem('eoco_inventory')) {
+                document.getElementById('syncStatus').innerText = "✓ Prices synced with QBO data";
+            }
+        }
     }
 
     function addLineItem() {
         const container = document.getElementById('itemsContainer');
         const div = document.createElement('div');
         div.className = 'line-item';
-        let catOptions = Object.keys(SERVICES).map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        let options = INVENTORY.map((item, i) => `<option value="${i}">${item.name} ($${item.price})</option>`).join('');
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Service</label>
-            <select class="cat-sel" onchange="updateTiers(this)">${catOptions}</select>
-            <label>Tier</label>
-            <select class="tier-sel" onchange="calculate()"></select>
+            <label>Select Item</label>
+            <select class="item-sel" onchange="calculate()">${options}</select>
+            <label>Quantity</label>
+            <input type="number" class="qty-inp" value="1" min="1" oninput="calculate()">
         `;
         container.appendChild(div);
-        updateTiers(div.querySelector('.cat-sel'));
-    }
-
-    function updateTiers(sel) {
-        const tierSel = sel.parentElement.querySelector('.tier-sel');
-        tierSel.innerHTML = SERVICES[sel.value].map((t, i) => `<option value="${i}">${t.tier} ($${t.price})</option>`).join('');
         calculate();
     }
 
     function calculate() {
-        const cats = document.querySelectorAll('.cat-sel');
-        const tiers = document.querySelectorAll('.tier-sel');
+        const sels = document.querySelectorAll('.item-sel');
+        const qtys = document.querySelectorAll('.qty-inp');
         let sub = 0;
-        cats.forEach((c, i) => { sub += SERVICES[c.value][tiers[i].value].price; });
-        const tax = sub * 0.14; // Updated to 14%
-        document.getElementById('subTotal').innerText = '$' + sub.toFixed(2);
-        document.getElementById('taxTotal').innerText = '$' + tax.toFixed(2);
-        document.getElementById('total').innerText = '$' + (sub + tax).toLocaleString(undefined, {minimumFractionDigits: 2});
+        sels.forEach((s, i) => {
+            sub += INVENTORY[s.value].price * (parseFloat(qtys[i].value) || 0);
+        });
+        const tax = sub * 0.14;
+        document.getElementById('sub').innerText = '$' + sub.toFixed(2);
+        document.getElementById('tax').innerText = '$' + tax.toFixed(2);
+        document.getElementById('grand').innerText = '$' + (sub + tax).toLocaleString(undefined, {minimumFractionDigits: 2});
+    }
+
+    function syncQBO(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const lines = e.target.result.split('\n');
+            const newInv = [];
+            // Assuming QBO CSV headers: "Product/Service Name" is col 0, "Sales Price / Rate" is col 3
+            // You can adjust these column numbers after your first export
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                if (cols.length > 1) {
+                    const name = cols[0].replace(/"/g, '').trim();
+                    const price = parseFloat(cols[3]) || 0; // Adjust col index if needed
+                    if (name) newInv.push({ name, price });
+                }
+            }
+            if (newInv.length > 0) {
+                INVENTORY = newInv;
+                localStorage.setItem('eoco_inventory', JSON.stringify(newInv));
+                document.getElementById('syncStatus').innerText = "✓ Successfully loaded " + newInv.length + " items!";
+                alert("Inventory updated! Prices are now synced.");
+                location.reload();
+            }
+        };
+        reader.readAsText(file);
     }
 
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const client = document.getElementById('clientName').value || "Client";
-        
-        // Branding Header
         doc.setFontSize(22); doc.setTextColor(45, 90, 39);
-        doc.text("EOCO | Bookkeeping Quote", 20, 25);
-        doc.setDrawColor(200); doc.line(20, 35, 190, 35);
-
-        doc.setFontSize(11); doc.setTextColor(0);
-        doc.text(`Client: ${client}`, 20, 45);
-        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
-        
-        // Detailed Items List
-        doc.setFontSize(12); doc.text("Summary of Services:", 20, 65);
-        const cats = document.querySelectorAll('.cat-sel');
-        const tiers = document.querySelectorAll('.tier-sel');
-        let yPos = 75;
-
-        cats.forEach((c, i) => {
-            const serviceName = c.value;
-            const tierName = SERVICES[c.value][tiers[i].value].tier;
-            const price = SERVICES[c.value][tiers[i].value].price;
-            doc.setFontSize(10); doc.setTextColor(100);
-            doc.text(`${serviceName} (${tierName})`, 25, yPos);
-            doc.text(`$${price.toFixed(2)}`, 170, yPos, { align: 'right' });
-            yPos += 8;
-        });
-
-        // Totals Section
-        yPos += 10;
-        doc.setDrawColor(200); doc.line(20, yPos, 190, yPos);
-        yPos += 10;
-        doc.setFontSize(10); doc.setTextColor(0);
-        doc.text("Monthly Subtotal:", 130, yPos);
-        doc.text(document.getElementById('subTotal').innerText, 170, yPos, { align: 'right' });
-        
-        yPos += 8;
-        doc.text("HST (14%):", 130, yPos);
-        doc.text(document.getElementById('taxTotal').innerText, 170, yPos, { align: 'right' });
-
-        yPos += 12;
-        doc.setFillColor(26, 26, 26); doc.rect(120, yPos - 8, 70, 15, 'F');
-        doc.setTextColor(255); doc.setFontSize(12);
-        doc.text("GRAND TOTAL", 125, yPos);
-        doc.text(document.getElementById('total').innerText, 185, yPos, { align: 'right' });
-
-        doc.setTextColor(150); doc.setFontSize(8);
-        doc.text("© 2026 EOCO - Nova Scotia", 20, 280);
-        
-        doc.save(`EOCO_Quote_${client.replace(/\s+/g, '_')}.pdf`);
+        doc.text("EOCO | Official Quote", 20, 25);
+        doc.setFontSize(12); doc.setTextColor(0);
+        doc.text(`Client: ${document.getElementById('clientName').value}`, 20, 45);
+        doc.text(`Total: ${document.getElementById('grand').innerText}`, 20, 60);
+        doc.save(`EOCO_Quote.pdf`);
     }
 </script>
 </body>
