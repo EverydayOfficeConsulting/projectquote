@@ -3,57 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EOCO | Quote Master</title>
+    <title>EOCO | Project Quote Master</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --bg: #f4f4f9; }
-        body { font-family: sans-serif; background: var(--bg); padding: 15px; display: flex; justify-content: center; margin: 0; }
-        .card { background: white; padding: 20px; border-radius: 12px; border: 3px solid var(--evergreen); max-width: 500px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h1 { margin: 0; font-size: 1.8rem; text-align: center; }
-        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
-        #gate { text-align: center; }
+        :root { --evergreen: #2d5a27; --dark: #1a1a1a; --border-gray: #ddd; }
+        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding: 10px; margin: 0; }
+        .card { background: white; padding: 20px; border-radius: 10px; border: 3px solid var(--evergreen); box-shadow: 0 4px 20px rgba(0,0,0,0.1); max-width: 450px; width: 100%; text-align: center; position: relative; min-height: 500px; }
+        #gate { display: block; color: black; }
         #calculator { display: none; }
-        .setup-section { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--evergreen); }
-        label { display: block; font-size: 0.65rem; font-weight: bold; color: #666; text-transform: uppercase; margin-bottom: 4px; }
-        input, select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
-        .line-item { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; margin-bottom: 10px; position: relative; border-left: 3px solid #ccc; }
-        .remove-btn { position: absolute; top: 5px; right: 5px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.2rem; }
-        .totals-box { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-top: 20px; }
-        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
-        .grand-total { font-size: 2.2rem; font-weight: 800; border-top: 1px solid #444; padding-top: 10px; margin-top: 10px; }
-        .btn { border: none; padding: 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 0.9rem; }
+        h1 { margin: 0; color: var(--dark); font-size: 1.6rem; font-weight: 800; }
+        .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.75rem; margin-bottom: 15px; text-transform: uppercase; }
+        label { display: block; margin: 10px 0 2px; font-weight: 600; font-size: 0.7rem; color: #666; text-align: left; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid var(--border-gray); border-radius: 8px; font-size: 1rem; box-sizing: border-box; text-align: center; margin-bottom: 8px; color: black; }
+        .line-item { background: #f9f9f9; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; position: relative; text-align: left; border-left: 4px solid var(--evergreen); }
+        .remove-btn { position: absolute; top: 5px; right: 10px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.2rem; }
+        .result-box { background: var(--dark); color: white; padding: 15px; border-radius: 8px; margin-top: 20px; text-align: right; }
+        .res-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 4px; }
+        .result-value { font-size: 2.2rem; font-weight: 800; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px; }
+        .btn { border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.85rem; width: 100%; margin-top: 8px; transition: 0.3s; }
         .btn-green { background: var(--evergreen); color: white; }
         .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
+        .qr-section { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ddd; display: flex; flex-direction: column; align-items: center; }
+        #qrcode { margin-top: 5px; padding: 5px; background: white; border: 1px solid #eee; min-height: 75px; }
+        .footer { font-size: 0.65rem; color: #777; margin-top: 15px; line-height: 1.3; }
     </style>
 </head>
 <body>
+
 <div class="card">
     <div id="gate">
         <h1>EOCO</h1>
-        <div class="sub-brand">Secure Quote Master</div>
+        <div class="sub-brand">Quote Master Access</div>
         <input type="password" id="passInput" placeholder="Password">
-        <button class="btn btn-green" onclick="unlock()">ACCESS SYSTEM</button>
+        <button class="btn btn-green" onclick="unlock()">UNLOCK SYSTEM</button>
     </div>
+
     <div id="calculator">
         <h1>EOCO</h1>
         <div class="sub-brand">Client Service Quoter</div>
-        <div class="setup-section">
-            <label>Client Name</label>
-            <input type="text" id="projName" placeholder="e.g. Acme Corp">
-        </div>
+        <label>CLIENT NAME</label>
+        <input type="text" id="clientName" placeholder="e.g. Acme Bookkeeping">
+        
         <div id="itemsContainer"></div>
+
         <button class="btn btn-outline" onclick="addLineItem()">+ ADD SERVICE FROM SHEET1</button>
-        <button class="btn btn-green" onclick="getPDF()">GENERATE FINAL QUOTE PDF</button>
-        <div class="totals-box">
-            <div class="total-row"><span>Monthly Subtotal:</span><span id="subTotal">$0.00</span></div>
-            <div class="total-row"><span>HST (15%):</span><span id="taxTotal">$0.00</span></div>
-            <div class="grand-total" id="grandTotal">$0.00</div>
+        <button class="btn btn-green" onclick="getPDF()">DOWNLOAD PDF QUOTE</button>
+
+        <div class="result-box">
+            <div class="res-row"><span>Monthly Subtotal:</span><span id="subTotal">$0.00</span></div>
+            <div class="res-row"><span>HST (14%):</span><span id="taxTotal">$0.00</span></div>
+            <div id="total" class="result-value">$0.00</div>
+            <div style="font-size: 0.6rem; color: #888; text-transform: uppercase;">Estimated Monthly Cost</div>
         </div>
+
+        <div class="qr-section"><div id="qrcode"></div></div>
+        <div class="footer">© 2026 EOCO - Nova Scotia</div>
     </div>
 </div>
+
 <script>
     const KEY = "NovaScotia2026";
-    // DATA MAPPED DIRECTLY FROM YOUR SHEET1.CSV
+    const URL = "https://tools.eoco.ca/projectquote/"; 
+    
     const SERVICES = {
         "Recording Transactions": [
             {tier: "0-25", price: 25}, {tier: "26-50", price: 50}, {tier: "51-75", price: 75}, {tier: "76-100", price: 100},
@@ -63,12 +75,12 @@
             {tier: "0-25", price: 11}, {tier: "26-50", price: 23}, {tier: "51-75", price: 35}, {tier: "76-100", price: 47},
             {tier: "101-125", price: 59}, {tier: "126-150", price: 71}, {tier: "151-175", price: 83}, {tier: "176-200", price: 95}
         ],
-        "Accounts Payable/Receivable": [
+        "AP / AR - Modified Accrual": [
             {tier: "0-25", price: 100}, {tier: "26-50", price: 200}, {tier: "51-75", price: 300}, {tier: "76-100", price: 400},
             {tier: "101-125", price: 500}, {tier: "126-150", price: 600}, {tier: "151-175", price: 700}, {tier: "176-200", price: 800}
         ],
-        "Reconciliations (Bank/PayPal)": [
-            {tier: "1-4 accounts", price: 90}, {tier: "5-8 accounts", price: 180}, {tier: "9-12 accounts", price: 270}
+        "Account Reconciliation": [
+            {tier: "1-4 Accts", price: 90}, {tier: "5-8 Accts", price: 180}, {tier: "9-12 Accts", price: 270}
         ],
         "Payroll: Fixed Salary": [
             {tier: "1 Staff", price: 15}, {tier: "2 Staff", price: 30}, {tier: "3 Staff", price: 45}, {tier: "4 Staff", price: 60}, {tier: "5 Staff", price: 75}
@@ -79,16 +91,27 @@
         "Software Subscriptions": [
             {tier: "Xero", price: 50}, {tier: "Quickbooks", price: 50}, {tier: "Dext", price: 50}, {tier: "Hubdoc", price: 50}, {tier: "Wagepoint", price: 50}
         ],
-        "Miscellaneous": [
-            {tier: "Petty Cash Track", price: 50}, {tier: "Financial Stmts", price: 20}, {tier: "Tax Return (YE)", price: 50}, {tier: "HST Returns", price: 50}
+        "Misc Compliance": [
+            {tier: "Petty Cash Track", price: 50}, {tier: "Financial Stmts", price: 20}, {tier: "HST Returns", price: 50}, {tier: "YE Corp Tax", price: 50}
         ]
     };
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
-            document.getElementById('gate').style.display = "none";
-            document.getElementById('calculator').style.display = "block";
+            localStorage.setItem('eoco_auth_quote', "true");
+            openApp();
         } else { alert("Access Denied"); }
+    }
+
+    window.onload = function() {
+        if (localStorage.getItem('eoco_auth_quote') === "true") openApp();
+    };
+
+    function openApp() {
+        document.getElementById('gate').style.display = "none";
+        document.getElementById('calculator').style.display = "block";
+        calculate();
+        new QRCode(document.getElementById("qrcode"), { text: URL, width: 75, height: 75, colorDark : "#2d5a27" });
     }
 
     function addLineItem() {
@@ -98,50 +121,84 @@
         let catOptions = Object.keys(SERVICES).map(cat => `<option value="${cat}">${cat}</option>`).join('');
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Service Category</label>
-            <select class="cat-select" onchange="updateTiers(this)">${catOptions}</select>
-            <label>Tier/Level</label>
-            <select class="tier-select" onchange="calculate()"></select>
+            <label>Service</label>
+            <select class="cat-sel" onchange="updateTiers(this)">${catOptions}</select>
+            <label>Tier</label>
+            <select class="tier-sel" onchange="calculate()"></select>
         `;
         container.appendChild(div);
-        updateTiers(div.querySelector('.cat-select'));
+        updateTiers(div.querySelector('.cat-sel'));
     }
 
-    function updateTiers(catSelect) {
-        const tierSelect = catSelect.parentElement.querySelector('.tier-select');
-        const cat = catSelect.value;
-        tierSelect.innerHTML = SERVICES[cat].map((t, i) => `<option value="${i}">${t.tier} ($${t.price})</option>`).join('');
+    function updateTiers(sel) {
+        const tierSel = sel.parentElement.querySelector('.tier-sel');
+        tierSel.innerHTML = SERVICES[sel.value].map((t, i) => `<option value="${i}">${t.tier} ($${t.price})</option>`).join('');
         calculate();
     }
 
     function calculate() {
-        const cats = document.querySelectorAll('.cat-select');
-        const tiers = document.querySelectorAll('.tier-select');
+        const cats = document.querySelectorAll('.cat-sel');
+        const tiers = document.querySelectorAll('.tier-sel');
         let sub = 0;
-        cats.forEach((cat, i) => {
-            const price = SERVICES[cat.value][tiers[i].value].price;
-            sub += price;
-        });
-        const tax = sub * 0.15;
-        const grand = sub + tax;
+        cats.forEach((c, i) => { sub += SERVICES[c.value][tiers[i].value].price; });
+        const tax = sub * 0.14; // Updated to 14%
         document.getElementById('subTotal').innerText = '$' + sub.toFixed(2);
         document.getElementById('taxTotal').innerText = '$' + tax.toFixed(2);
-        document.getElementById('grandTotal').innerText = '$' + grand.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById('total').innerText = '$' + (sub + tax).toLocaleString(undefined, {minimumFractionDigits: 2});
     }
 
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const client = document.getElementById('projName').value || "Client";
+        const client = document.getElementById('clientName').value || "Client";
+        
+        // Branding Header
         doc.setFontSize(22); doc.setTextColor(45, 90, 39);
-        doc.text("EOCO | Service Quote", 20, 25);
-        doc.setFontSize(12); doc.setTextColor(0);
-        doc.text(`Client: ${client}`, 20, 40);
-        doc.text(`Monthly Subtotal: ${document.getElementById('subTotal').innerText}`, 20, 50);
-        doc.text(`HST (15%): ${document.getElementById('taxTotal').innerText}`, 20, 60);
-        doc.setFontSize(18);
-        doc.text(`ESTIMATED MONTHLY: ${document.getElementById('grandTotal').innerText}`, 20, 75);
-        doc.save(`EOCO_Quote_${client}.pdf`);
+        doc.text("EOCO | Bookkeeping Quote", 20, 25);
+        doc.setDrawColor(200); doc.line(20, 35, 190, 35);
+
+        doc.setFontSize(11); doc.setTextColor(0);
+        doc.text(`Client: ${client}`, 20, 45);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
+        
+        // Detailed Items List
+        doc.setFontSize(12); doc.text("Summary of Services:", 20, 65);
+        const cats = document.querySelectorAll('.cat-sel');
+        const tiers = document.querySelectorAll('.tier-sel');
+        let yPos = 75;
+
+        cats.forEach((c, i) => {
+            const serviceName = c.value;
+            const tierName = SERVICES[c.value][tiers[i].value].tier;
+            const price = SERVICES[c.value][tiers[i].value].price;
+            doc.setFontSize(10); doc.setTextColor(100);
+            doc.text(`${serviceName} (${tierName})`, 25, yPos);
+            doc.text(`$${price.toFixed(2)}`, 170, yPos, { align: 'right' });
+            yPos += 8;
+        });
+
+        // Totals Section
+        yPos += 10;
+        doc.setDrawColor(200); doc.line(20, yPos, 190, yPos);
+        yPos += 10;
+        doc.setFontSize(10); doc.setTextColor(0);
+        doc.text("Monthly Subtotal:", 130, yPos);
+        doc.text(document.getElementById('subTotal').innerText, 170, yPos, { align: 'right' });
+        
+        yPos += 8;
+        doc.text("HST (14%):", 130, yPos);
+        doc.text(document.getElementById('taxTotal').innerText, 170, yPos, { align: 'right' });
+
+        yPos += 12;
+        doc.setFillColor(26, 26, 26); doc.rect(120, yPos - 8, 70, 15, 'F');
+        doc.setTextColor(255); doc.setFontSize(12);
+        doc.text("GRAND TOTAL", 125, yPos);
+        doc.text(document.getElementById('total').innerText, 185, yPos, { align: 'right' });
+
+        doc.setTextColor(150); doc.setFontSize(8);
+        doc.text("© 2026 EOCO - Nova Scotia", 20, 280);
+        
+        doc.save(`EOCO_Quote_${client.replace(/\s+/g, '_')}.pdf`);
     }
 </script>
 </body>
