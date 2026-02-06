@@ -13,20 +13,25 @@
         #calculator { display: none; }
         h1 { margin: 0; color: var(--dark); font-size: 1.8rem; font-weight: 900; }
         .sub-brand { color: var(--evergreen); font-weight: bold; font-size: 0.8rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; }
+        
         .setup-section { background:#f9f9f9; border:1px solid var(--border); padding:15px; border-radius:12px; margin-bottom:20px; text-align: left; }
         label { display: block; margin: 10px 0 2px; font-weight: 700; font-size: 0.65rem; color: #666; text-transform: uppercase; }
         input, select { width: 100%; padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 0.95rem; box-sizing: border-box; margin-bottom: 8px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
         .line-item { background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-bottom: 12px; position: relative; text-align: left; border-left: 6px solid var(--evergreen); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .remove-btn { position: absolute; top: 10px; right: 10px; color: #d32f2f; cursor: pointer; font-weight: bold; border: none; background: none; font-size: 1.4rem; }
+        
         .result-box { background: var(--dark); color: white; padding: 20px; border-radius: 12px; margin-top: 25px; text-align: right; }
         .res-row { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; opacity: 0.8; }
         .result-value { font-size: 2.3rem; font-weight: 900; margin-top: 10px; border-top: 1px solid #444; padding-top: 10px; }
-        .btn { border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.9rem; width: 100%; margin-top: 10px; }
+        
+        .btn { border: none; padding: 16px; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 0.9rem; width: 100%; margin-top: 10px; transition: 0.2s; }
         .btn-green { background: var(--evergreen); color: white; }
-        .btn-outline { background: white; border: 2px solid var(--evergreen); color: var(--evergreen); }
-        .sync-section { margin-top: 30px; padding: 15px; background: #eee; border-radius: 10px; font-size: 0.75rem; border: 2px dashed #bbb; }
+        .btn-outline { background: white; border: 3px solid var(--evergreen); color: var(--evergreen); }
+        
+        #logoPreview { max-height: 60px; margin-bottom: 10px; display: none; }
         .footer { font-size: 0.65rem; color: #888; margin-top: 20px; line-height: 1.4; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     </style>
 </head>
 <body>
@@ -40,11 +45,22 @@
     </div>
 
     <div id="calculator">
-        <h1>EOCO</h1>
-        <div class="sub-brand">Project Quote Master</div>
-        
+        <div class="setup-section" style="border-bottom: 4px solid var(--evergreen);">
+            <label>Business Logo</label>
+            <input type="file" id="logoUpload" accept="image/*" onchange="previewLogo(this)">
+            <img id="logoPreview" src="">
+            
+            <label>PDF Proposal Title</label>
+            <input type="text" id="pdfTitle" value="PROJECT PROPOSAL">
+            
+            <label>Business Name & Location</label>
+            <input type="text" id="bizName" value="Everyday Office Consulting - Nova Scotia">
+            
+            <button class="btn btn-outline" style="padding: 8px; font-size: 0.7rem;" onclick="saveBranding()">SAVE BRANDING FOR NEXT TIME</button>
+        </div>
+
         <div class="setup-section">
-            <label>* Customer Name (Match QBO)</label>
+            <label>* Customer Name</label>
             <input type="text" id="custName" placeholder="Full Name">
             <div class="grid-2">
                 <div><label>* Invoice #</label><input type="text" id="invNo" placeholder="1001"></div>
@@ -54,12 +70,11 @@
                 <div><label>* Invoice Date</label><input type="date" id="invDate"></div>
                 <div><label>* Due Date</label><input type="date" id="dueDate"></div>
             </div>
-            <label>Notes</label><input type="text" id="memo" placeholder="Project details">
         </div>
         
         <div id="itemsContainer"></div>
-
         <button class="btn btn-outline" onclick="addLineItem()">+ ADD ITEM</button>
+
         <div class="grid-2">
             <button class="btn btn-green" onclick="getPDF()">GET PDF</button>
             <button class="btn btn-outline" onclick="exportQBO()">QBO IMPORT</button>
@@ -67,24 +82,21 @@
 
         <div class="result-box">
             <div class="res-row"><span>Subtotal:</span><span id="subTotal">$0.00</span></div>
-            <div class="res-row"><span>Nova Scotia HST (14%):</span><span id="taxTotal">$0.00</span></div>
+            <div class="res-row"><span>HST (14%):</span><span id="taxTotal">$0.00</span></div>
             <div id="total" class="result-value">$0.00</div>
         </div>
 
-        <div class="sync-section">
-            <strong>SYNC QBO PRICING</strong><br>
-            Upload "Products & Services" CSV.<br>
-            <em>Col A: Name | Col H: Price</em><br><br>
-            <input type="file" id="csvFile" accept=".csv" onchange="syncQBO(this)">
-            <div id="syncStatus" style="margin-top:10px; font-weight:bold; color:var(--evergreen);"></div>
+        <div class="setup-section" style="margin-top:20px; background:#eee;">
+            <label>Sync QBO Inventory (Col A: Name | Col H: Price)</label>
+            <input type="file" accept=".csv" onchange="syncQBO(this)">
         </div>
-        <div class="footer">© 2026 Everyday Office Consulting</div>
     </div>
 </div>
 
 <script>
     const KEY = "NovaScotia2026";
-    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Standard Labor", price: 75.00 }];
+    let INVENTORY = JSON.parse(localStorage.getItem('eoco_inventory')) || [{ name: "Service Item", price: 100.00 }];
+    let logoData = localStorage.getItem('eoco_logo') || null;
 
     function unlock() {
         if (document.getElementById('passInput').value === KEY) {
@@ -95,18 +107,43 @@
 
     window.onload = function() {
         if (localStorage.getItem('eoco_auth_quote') === "true") openApp();
+        
+        // Load Saved Branding
+        if(localStorage.getItem('eoco_biz_name')) document.getElementById('bizName').value = localStorage.getItem('eoco_biz_name');
+        if(localStorage.getItem('eoco_pdf_title')) document.getElementById('pdfTitle').value = localStorage.getItem('eoco_pdf_title');
+        if(logoData) {
+            const img = document.getElementById('logoPreview');
+            img.src = logoData;
+            img.style.display = 'inline-block';
+        }
+
         const now = new Date();
         document.getElementById('invDate').valueAsDate = now;
         const thirtyDays = new Date(now.setDate(now.getDate() + 30));
         document.getElementById('dueDate').valueAsDate = thirtyDays;
     };
 
+    function previewLogo(input) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            logoData = e.target.result;
+            const img = document.getElementById('logoPreview');
+            img.src = logoData;
+            img.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+
+    function saveBranding() {
+        localStorage.setItem('eoco_biz_name', document.getElementById('bizName').value);
+        localStorage.setItem('eoco_pdf_title', document.getElementById('pdfTitle').value);
+        if(logoData) localStorage.setItem('eoco_logo', logoData);
+        alert("Branding Saved!");
+    }
+
     function openApp() {
         document.getElementById('gate').style.display = "none";
         document.getElementById('calculator').style.display = "block";
-        if (localStorage.getItem('eoco_inventory')) {
-            document.getElementById('syncStatus').innerText = "✓ System Synced with QBO Prices";
-        }
         calculate();
     }
 
@@ -117,9 +154,9 @@
         let options = INVENTORY.sort((a,b) => a.name.localeCompare(b.name)).map((item, i) => `<option value="${i}">${item.name} ($${item.price.toFixed(2)})</option>`).join('');
         div.innerHTML = `
             <button class="remove-btn" onclick="this.parentElement.remove(); calculate();">×</button>
-            <label>Item</label>
+            <label>Product/Service</label>
             <select class="item-sel" onchange="calculate()">${options}</select>
-            <label>Qty</label>
+            <label>Quantity</label>
             <input type="number" class="qty-inp" value="1" step="0.25" oninput="calculate()">
         `;
         container.appendChild(div);
@@ -138,17 +175,15 @@
     }
 
     function syncQBO(input) {
-        const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = (e) => {
             const lines = e.target.result.split('\n');
             const newInv = [];
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                 if (cols.length > 7) {
                     const name = cols[0].replace(/"/g, '').trim();
-                    const priceRaw = cols[7].replace(/"/g, '').replace(/[$,]/g, '').trim();
-                    const price = parseFloat(priceRaw) || 0;
+                    const price = parseFloat(cols[7].replace(/[$,]/g, '')) || 0;
                     if (name) newInv.push({ name, price });
                 }
             }
@@ -158,7 +193,7 @@
                 location.reload();
             }
         };
-        reader.readAsText(file);
+        reader.readAsText(input.files[0]);
     }
 
     function exportQBO() {
@@ -166,20 +201,16 @@
         const invNo = document.getElementById('invNo').value || "1001";
         const invDate = document.getElementById('invDate').value.split('-').reverse().join('/');
         const dueDate = document.getElementById('dueDate').value.split('-').reverse().join('/');
-        const terms = document.getElementById('terms').value;
-        const memo = document.getElementById('memo').value;
         let csv = "*InvoiceNo,*Customer,*InvoiceDate,*DueDate,Terms,Location,Memo,Item(Product/Service),ItemDescription,ItemQuantity,ItemRate,*ItemAmount,*ItemTaxCode,ItemTaxAmount\n";
-        const sels = document.querySelectorAll('.item-sel');
-        const qtys = document.querySelectorAll('.qty-inp');
-        sels.forEach((s, i) => {
+        document.querySelectorAll('.item-sel').forEach((s, i) => {
             const item = INVENTORY[s.value];
-            const qty = parseFloat(qtys[i].value) || 0;
+            const qty = parseFloat(document.querySelectorAll('.qty-inp')[i].value) || 0;
             const amt = item.price * qty;
             const taxAmt = amt * 0.14;
             if (i === 0) {
-                csv += `${invNo},${client},${invDate},${dueDate},${terms},,${memo},"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+                csv += `${invNo},${client},${invDate},${dueDate},${document.getElementById('terms').value},,,${item.name},,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
             } else {
-                csv += `${invNo},,,,,,,,"${item.name}",,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
+                csv += `${invNo},,,,,,,,${item.name},,${qty},${item.price},${amt.toFixed(2)},HST,${taxAmt.toFixed(2)}\n`;
             }
         });
         const blob = new Blob([csv], { type: 'text/csv' });
@@ -192,23 +223,30 @@
     function getPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const bizName = document.getElementById('bizName').value;
+        const pdfTitle = document.getElementById('pdfTitle').value;
         const client = document.getElementById('custName').value || "Customer";
-        
+
+        let textX = 20;
+        if (logoData) {
+            doc.addImage(logoData, 'PNG', 20, 15, 30, 15);
+            textX = 55; // Move text over if logo exists
+        }
+
         doc.setFontSize(22); doc.setTextColor(45, 90, 39);
-        doc.text("EOCO | PROJECT PROPOSAL", 20, 25);
+        doc.text(pdfTitle, textX, 25);
+        
         doc.setFontSize(10); doc.setTextColor(100);
-        doc.text("Everyday Office Consulting - Nova Scotia", 20, 32);
-        doc.setDrawColor(45, 90, 39); doc.line(20, 38, 190, 38);
+        doc.text(bizName, textX, 32);
+        
+        doc.setDrawColor(45, 90, 39); doc.line(20, 40, 190, 40);
 
         doc.setFontSize(11); doc.setTextColor(0);
         doc.text(`Customer: ${client}`, 20, 50);
-        doc.text(`Reference: ${document.getElementById('invNo').value}`, 20, 57);
+        doc.text(`Invoice Reference: ${document.getElementById('invNo').value}`, 20, 57);
         doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 64);
         
-        doc.setFontSize(12); doc.setTextColor(45, 90, 39);
-        doc.text("ITEMIZED SERVICES", 20, 80);
-        
-        let y = 90;
+        let y = 85;
         document.querySelectorAll('.item-sel').forEach((s, i) => {
             const item = INVENTORY[s.value];
             const qty = parseFloat(document.querySelectorAll('.qty-inp')[i].value) || 0;
@@ -218,22 +256,13 @@
             y += 8;
         });
 
-        y += 10;
-        doc.setDrawColor(200); doc.line(20, y, 190, y);
-        y += 12;
-        doc.setFontSize(10); doc.text("Subtotal:", 130, y);
-        doc.text(document.getElementById('subTotal').innerText, 180, y, { align: 'right' });
-        y += 7;
-        doc.text("NS HST (14%):", 130, y);
-        doc.text(document.getElementById('taxTotal').innerText, 180, y, { align: 'right' });
-        
-        y += 12;
-        doc.setFillColor(45, 90, 39); doc.rect(120, y-8, 70, 15, 'F');
-        doc.setTextColor(255); doc.setFontSize(14);
-        doc.text("TOTAL ESTIMATE", 125, y);
-        doc.text(document.getElementById('total').innerText, 185, y, { align: 'right' });
+        y += 10; doc.line(20, y, 190, y);
+        y += 12; doc.text("Subtotal:", 130, y); doc.text(document.getElementById('subTotal').innerText, 180, y, { align: 'right' });
+        y += 7; doc.text("NS HST (14%):", 130, y); doc.text(document.getElementById('taxTotal').innerText, 180, y, { align: 'right' });
+        y += 12; doc.setFillColor(45, 90, 39); doc.rect(120, y-8, 70, 15, 'F');
+        doc.setTextColor(255); doc.setFontSize(14); doc.text("TOTAL ESTIMATE", 125, y); doc.text(document.getElementById('total').innerText, 185, y, { align: 'right' });
 
-        doc.save(`EOCO_Proposal_${client}.pdf`);
+        doc.save(`EOCO_Quote_${client.replace(/\s+/g, '_')}.pdf`);
     }
 </script>
 </body>
